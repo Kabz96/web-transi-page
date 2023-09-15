@@ -1,0 +1,56 @@
+// ON PAGE LOAD
+$(".content-wrapper").addClass("first");
+let nextPageLink;
+
+//On Click
+$(".menu_link:not(.w--current)").on("click", function () {
+  e.preventDefault();
+  nextPageLink = $(this).attr("href");
+  //AJAX
+  $.ajax({
+    url: nextPageLink,
+    success: function (response) {
+      let element = $(response).find(".content-wrapper").addClass("second");
+      $(".main-wrapper").append(element);
+    },
+    complete: function () {
+      pageTransition();
+    }
+  });
+});
+
+function pageTransition() {
+  $("html").addClass("animating");
+  //GSAP
+  let tl = gsap.timeline({
+    onComplete: updatePage
+  });
+  tl.from(".content-wrapper.second", {
+    y: "110vh",
+    delay: 0.2,
+    duration: 0.8,
+    ease: "power2.out"
+  });
+  tl.to(
+    ".overlay",
+    {
+      opacity: 1,
+      duration: 0.3,
+      ease: "power1.out"
+    },
+    0
+  );
+  tl.to(
+    ".content-wrapper.first",
+    {
+      scale: 0.95,
+      duration: 0.3,
+      ease: "power1.out"
+    },
+    0
+  );
+}
+
+function updatePage() {
+  window.location = nextPageLink;
+}z

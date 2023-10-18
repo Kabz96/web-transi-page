@@ -1,0 +1,234 @@
+<script src="https://cdn.jsdelivr.net/npm/jquery.ripples@0.6.3/dist/jquery.ripples.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.10.4/gsap.min.js"></script>
+<script>
+$('.mindtext').ripples({
+	resolution: 512,
+	dropRadius: 7,
+	perturbance: 0.01,
+});
+</script>
+<script>
+$(".btn_wrap").each(function (index) {
+  let bgPanel = $(this).children().eq(0);
+  let fgPanel = $(this).children().eq(1);
+
+  let tl = gsap.timeline({ paused: true, defaults: { duration: 0.1, ease: "none" } });
+  tl.set(bgPanel, { opacity: 1 });
+  tl.fromTo(fgPanel, { clipPath: "polygon(100% 0%, 100% 100%, 100% 100%, 0% 100%, 0% 0%)" }, { clipPath: "polygon(100% 0%, 100% 0%, 0% 100%, 0% 100%, 0% 0%)" });
+  tl.fromTo(bgPanel, { clipPath: "polygon(100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%)" }, { clipPath: "polygon(100% 0%, 100% 100%, 0% 100%, 0% 100%, 100% 0%)" }, "<");
+  tl.to(fgPanel, { clipPath: "polygon(0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%)" });
+  tl.to(bgPanel, { clipPath: "polygon(100% 0%, 100% 100%, 0% 100%, 0% 0%, 0% 0%)" }, "<");
+
+  $(this).on("mouseenter", function () {
+    tl.play();
+  });
+  $(this).on("mouseleave", function () {
+    tl.reverse();
+  });
+});
+</script>
+<script>
+let object = {
+  value: 1
+};
+
+let tl = gsap.timeline({ repeat: -1 });
+tl.fromTo(
+  ".marquee_track",
+  {
+    xPercent: 0
+  },
+  {
+    xPercent: -50,
+    duration: 14,
+    ease: "none"
+  }
+);
+
+$(".marquee_track").on("mouseenter", function () {
+  gsap.fromTo(
+    object,
+    {
+      value: 1
+    },
+    {
+      value: 0,
+      duration: 1.2,
+      onUpdate: () => {
+        tl.timeScale(object.value);
+      }
+    }
+  );
+});
+
+$(".marquee_track").on("mouseleave", function () {
+  gsap.fromTo(
+    object,
+    {
+      value: 0
+    },
+    {
+      value: 1,
+      duration: 1.2,
+      onUpdate: () => {
+        tl.timeScale(object.value);
+      }
+    }
+  );
+});
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.8.0/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/split-type"></script>
+<script>
+let typeSplit;
+// Split the text up
+function runSplit() {
+  typeSplit = new SplitType(".split-lines", {
+    types: "lines, words"
+  });
+  $(".line").append("<div class='line-mask'></div>");
+  createAnimation();
+}
+runSplit();
+// Update on window resize
+let windowWidth = $(window).innerWidth();
+window.addEventListener("resize", function () {
+  if (windowWidth !== $(window).innerWidth()) {
+    windowWidth = $(window).innerWidth();
+    typeSplit.revert();
+    runSplit();
+  }
+});
+
+gsap.registerPlugin(ScrollTrigger);
+
+function createAnimation() {
+  $(".line").each(function (index) {
+    let tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: $(this),
+        // trigger element - viewport
+        start: "top center",
+        end: "bottom center",
+        scrub: 1
+      }
+    });
+    tl.to($(this).find(".line-mask"), {
+      width: "0%",
+      duration: 1
+    });
+  });
+}
+</script>
+<script>
+  // Wrap the animation code in a function to ensure it runs after the page loads
+  document.addEventListener("DOMContentLoaded", function () {
+    // Select the "rotate-spin" element
+    const rotateSpin = document.querySelector(".content-spin .rotate-spin");
+
+    // Create a GSAP animation timeline for the infinite rotation
+    const rotationTimeline = gsap.timeline({ repeat: -1 });
+
+    // Define the rotation animation for infinite rotation
+    const rotationAnimation = gsap.to(rotateSpin, {
+      rotation: 360, // Rotate 360 degrees (1 full rotation)
+      duration: 4,  // Animation duration is 4 seconds
+      ease: "linear", // Linear easing for a constant rotation speed
+      repeat: -1, // Infinite loop
+    });
+
+    // Set the default animation speed to 4 seconds
+    rotationTimeline.add(rotationAnimation);
+  });
+</script>
+<script>
+// Function to animate a single services_underline element
+        function animateServicesUnderline(element) {
+            gsap.to(element, {
+                width: '100%', // Animate to 100% width
+                opacity: 1, // Fade to full opacity
+                delay: 0.5,
+                duration: 1, // Duration of the animation (1 second)
+                ease: 'power2.out', // Easing function for smooth animation
+            });
+        }
+
+        // Create an Intersection Observer to track when parent services_descri divs come into view
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    // If the parent services_descri is in view, trigger the animation for its child services_underline
+                    const underlines = entry.target.querySelectorAll('.services_underline');
+                    underlines.forEach((underline) => {
+                        animateServicesUnderline(underline);
+                    });
+                }
+            });
+        });
+
+        // Get all services_descri divs by class
+        const servicesDescriDivs = document.querySelectorAll('.services_descri');
+
+        // Observe each services_descri div
+        servicesDescriDivs.forEach((div) => {
+            observer.observe(div);
+         });
+    </script>
+<script>
+  // Wrap the animation code in a function to ensure it runs after the page loads
+  document.addEventListener("DOMContentLoaded", function () {
+    // Select the "round_shape" element
+    const roundShape = document.querySelector(".text-animate_container .round_shape");
+
+    // Create a GSAP animation timeline for the infinite rotation
+    const rotationTimeline = gsap.timeline({ repeat: -1 });
+
+    // Define the rotation animation for infinite rotation
+    const rotationAnimation = gsap.to(roundShape, {
+      rotation: 360, // Rotate 360 degrees (1 full rotation)
+      duration: 4,  // Initial animation duration is 4 seconds
+      ease: "linear", // Linear easing for a constant rotation speed
+      repeat: -1, // Infinite loop
+    });
+
+    // Set the default animation speed to 4 seconds
+    rotationTimeline.add(rotationAnimation);
+  });
+</script>
+<script>
+if(CSS.supports("-moz-transform-style","preserve-3d")||CSS.supports("-ms-transform-style","preserve-3d")||CSS.supports("-webkit-transform-style","preserve-3d")||CSS.supports("transform-style","preserve-3d")){z_default={depth:"1rem",direction:"both",event:"none",eventRotation:"30deg",eventDirection:"default",fade:!1,layers:10,perspective:"500px",z:!0};var zs=document.querySelectorAll("[data-z]");function Ztextify(e,t){document.querySelectorAll(e).forEach(e=>{zDraw(e,t)})}function zDraw(e,t){if("false"!==(t.zEngaged||z_default.zEngaged)){var n=t.depth||z_default.depth,r=n.match(/[a-z]+/)[0],a=parseFloat(n.replace(r,"")),s=t.direction||z_default.direction,o=t.event||z_default.event,l=t.eventRotation||z_default.eventRotation,d=l.match(/[a-z]+/)[0],c=parseFloat(l.replace(d,"")),p=t.eventDirection||z_default.eventDirection,f=t.fade||z_default.fade,u=t.layers||z_default.layers,v=t.perspective||z_default.perspective,y=t.transform||z_default.transform,w=e.innerHTML;e.innerHTML="",e.style.display="inline-block",e.style.position="relative",e.style.webkitPerspective=v,e.style.perspective=v;var z=document.createElement("span");z.setAttribute("class","z-text"),z.style.display="inline-block",z.style.webkitTransformStyle="preserve-3d",z.style.transformStyle="preserve-3d";var h=document.createElement("span");for(h.setAttribute("class","z-layers"),h.style.display="inline-block",h.style.webkitTransformStyle="preserve-3d",h.style.transformStyle="preserve-3d",z.append(h),i=0;i<u;i++){let e=i/u;var m=document.createElement("span");if(m.setAttribute("class","z-layer"),m.innerHTML=w,m.style.display="inline-block","backwards"===s)var b=-e*a;if("both"===s)b=-e*a+a/2;if("forwards"===s)b=-e*a+a;y="translateZ("+b+r+")";m.style.webkitTransform=y,m.style.transform=y,i>=1&&(m.style.position="absolute",m.style.top=0,m.style.left=0,m.setAttribute("aria-hidden","true"),m.style.pointerEvents="none",m.style.mozUserSelect="none",m.style.msUserSelect="none",m.style.webkitUserSelect="none",m.style.userSelect="none",!0!==f&&"true"!==f||(m.style.opacity=(1-e)/2)),h.append(m)}function g(e,t){if("reverse"==p)var n=-1;else n=1;var r=e*c*n,i=-t*c*n,a=(Math.min(Math.max(r,-1),1),Math.min(Math.max(i,-1),1),"rotateX("+i+d+") rotateY("+r+d+")");h.style.webkitTransform=a,h.style.transform=a}if(e.append(z),"pointer"===o&&(window.addEventListener("mousemove",e=>{g(2*(e.clientX/window.innerWidth-.5),2*(e.clientY/window.innerHeight-.5))},!1),window.addEventListener("touchmove",e=>{g(2*(e.touches[0].clientX/window.innerWidth-.5),2*(e.touches[0].clientY/window.innerHeight-.5))},!1)),"scroll"==o){scroll(),window.addEventListener("scroll",(function(){var t=e.getBoundingClientRect(),n=t.left+t.width/2-window.innerWidth/2,r=t.top+t.height/2-window.innerHeight/2;g(n/window.innerWidth*-2,r/window.innerHeight*-2)}),!1)}if("scrollY"==o){scrollY(),window.addEventListener("scroll",(function(){var t=e.getBoundingClientRect();g(0,(t.top+t.height/2-window.innerHeight/2)/window.innerHeight*-2)}),!1)}if("scrollX"==o){scrollX(),window.addEventListener("scroll",(function(){var t=e.getBoundingClientRect();g((t.left+t.width/2-window.innerWidth/2)/window.innerWidth*-2,0)}),!1)}}}zs.forEach(e=>{options={depth:e.dataset.zDepth||z_default.depth,direction:e.dataset.zDirection||z_default.direction,event:e.dataset.zEvent||z_default.event,eventRotation:e.dataset.zEventrotation||z_default.eventRotation,eventDirection:e.dataset.zEventdirection||z_default.eventDirection,fade:e.dataset.zFade||z_default.fade,layers:parseFloat(e.dataset.zLayers)||z_default.layers,perspective:e.dataset.zPerspective||z_default.perspective,zEngaged:e.dataset.z||z_default.z},zDraw(e,options)})}else console.error("ztext is disabled because CSS transform-style: preserve3d; is unsupported.");
+</script>
+<script>
+var ztxt = new Ztextify(".mcstudio-text", {
+   depth: "60px",
+   layers: 8,
+   fade: true,
+   direction: "forwards",
+   event: "pointer",
+   eventRotation: "60deg"
+});
+</script>
+<script>
+  // Wrap the animation code in a function to ensure it runs after the page loads
+  document.addEventListener("DOMContentLoaded", function () {
+    // Select the "work_content" element
+    const workContent = document.querySelector(".work_content");
+
+    // Set the initial opacity to 0
+    gsap.set(workContent, { opacity: 0 });
+
+    // Create a GSAP animation to gradually change the opacity to 1
+    gsap.to(workContent, {
+      opacity: 1,
+      duration: 1, 
+      ease: "power2.out", 
+      scrollTrigger: {
+        trigger: workContent, 
+        start: "top center", 
+        end: "bottom center", 
+        markers: true, 
+        scrub: true,
+      },
+    });
+  });
+</script>

@@ -1,0 +1,196 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/2.0.9/typed.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script
+  defer
+  src="https://cdn.jsdelivr.net/gh/vallafederico/hacking-webflow@master/dist/text-split.03.js"
+></script>
+<script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.23/bundled/lenis.min.js"></script> 
+<script>
+//BETWEEN PAGE ANIMATION
+// ON PAGE LOAD
+$(".content-wrapper").addClass("first");
+let nextPageLink;
+
+//ON CLICK
+$(".menu_link:not(.w--current)").on("click", function (e) {
+  e.preventDefault();
+  nextPageLink = $(this).attr("href");
+  //AJAX
+  $.ajax({
+    url: nextPageLink,
+    success: function (response) {
+      let element = $(response).find(".content-wrapper").addClass("second");
+      $(".main-wrapper").append(element);
+    },
+    complete: function () {
+      pageTransition();
+    }
+  });
+});
+
+function pageTransition() {
+  $("html").addClass("animating");
+  //GSAP
+  let tl = gsap.timeline({
+    onComplete: updatePage
+  });
+  tl.from(".content-wrapper.second", {
+    y: "110vh",
+    delay: 0.2,
+    duration: 1.2,
+    ease: "power2.out"
+  });
+  tl.to(".overlay", {
+      opacity: 1,
+      duration: 0.5,
+      ease: "power1.out"
+    }, 0);
+  tl.to(".content-wrapper.first", {
+      scale: 0.95,
+      duration: 0.4,
+      ease: "power1.out"
+    }, 0);
+}
+
+function updatePage() {
+  window.location = nextPageLink;
+}
+
+</script>
+<script>
+//MENU LINK ANIMATION
+
+let duration = 1200;
+let menuShape = $(".menu_shape");
+let menuShapeBG = $(".menu_shape-bg");
+let menuLink = $(".menu_link");
+let currentlink = $(".menu_link.w--current");
+
+// ON PAGE LOAD
+moveShape(currentlink);
+$(".menu_link-bg").css("opacity", "0");
+menuShape.css("opacity", "1");
+menuLink.css("pointer-events", "auto");
+
+// On Click
+menuLink.on("click", function (e) {
+  e.preventDefault();
+  setTimeout(() => {
+    window.location = $(this).attr("href");
+  }, duration);
+  // menushapeBG Stretch
+  if ($(this).index() > currentlink.index()) {
+    menuShape.css("justify-content", "flex-end");
+  }
+  if (currentlink.index() !== $(this).index()) {
+    menuShapeBG.css("transition", `width ${duration / 2}ms`);
+    menuShapeBG.css("width", "140%");
+    setTimeout(() => {
+      menuShapeBG.css("width", "100%");
+    }, duration / 2);
+  }
+  // menushape move
+  menuShape.css("transition", `all ${duration}ms`);
+  moveShape($(this));
+});
+
+function moveShape(target) {
+  let linkwidth = target.innerWidth();
+  let linkOffset = target.offset().left;
+  let menuOffset = $(".menu").offset().left;
+  let leftPosition = linkOffset - menuOffset;
+  menuShape.css("width", linkwidth);
+  menuShape.css("left", leftPosition);
+}
+
+// Resize
+window.addEventListener("resize", function () {
+  moveShape(currentlink);
+});
+</script>
+<script>
+// LENIS SMOOTH SCROLL
+let lenis;
+if (Webflow.env("editor") === undefined) {
+  lenis = new Lenis({
+    lerp: 0.1,
+    wheelMultiplier: 0.7,
+    gestureOrientation: "vertical",
+    normalizeWheel: false,
+    smoothTouch: false
+  });
+  function raf(time) {
+    lenis.raf(time);
+    requestAnimationFrame(raf);
+  }
+  requestAnimationFrame(raf);
+}
+$("[data-lenis-start]").on("click", function () {
+  lenis.start();
+});
+$("[data-lenis-stop]").on("click", function () {
+  lenis.stop();
+});
+$("[data-lenis-toggle]").on("click", function () {
+  $(this).toggleClass("stop-scroll");
+  if ($(this).hasClass("stop-scroll")) {
+    lenis.stop();
+  } else {
+    lenis.start();
+  }
+});
+</script>
+<script>
+// Function to check if the current page is the homepage
+function isHomePage() {
+  return window.location.pathname === '/';
+}
+
+// Code that runs on pageload
+gsap.to(".load_grid-item", {
+  opacity: 0,
+  duration: 0.001,
+  stagger: { amount: 0.5, from: "random" },
+  onComplete: () => {
+    gsap.set(".load_grid", { display: "none" });
+  }
+});
+
+// Code that runs on click of a link
+$(document).ready(function () {
+  $("a").on("click", function (e) {
+    if (
+    	$(this).prop("hostname") === window.location.host &&
+      $(this).attr("href").indexOf("#") === -1 &&
+      $(this).attr("target") !== "_blank" &&
+      !isHomePage()
+    ) {
+        e.preventDefault();
+        let destination = $(this).attr("href");
+        gsap.set(".load_grid", { display: "grid" });
+        gsap.fromTo(
+          ".load_grid-item",
+          {
+            opacity: 0
+          },
+          {
+            opacity: 1,
+            duration: 0.001,
+            stagger: { amount: 0.5, from: "random" },
+            onComplete: () => {
+              window.location = destination;
+            }
+          }
+        );
+    }
+  });
+  
+  // On click of the back button
+  window.onpageshow = function(event){
+  	if (event.persisted) {
+    	window.location.reload();
+    }
+  }
+});
+
+</script>
